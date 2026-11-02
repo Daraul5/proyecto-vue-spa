@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container">
-      <span class="navbar-brand">Mi Tienda SPA</span>
+      <span class="navbar-brand">SPA TIENDA</span>
       <div class="navbar-nav">
         <RouterLink class="nav-link" to="/">Inicio</RouterLink>
         <RouterLink class="nav-link" to="/productos">Productos</RouterLink>
