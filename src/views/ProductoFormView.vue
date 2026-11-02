@@ -31,21 +31,47 @@ const guardar = () => {
 </script>
 
 <template>
-  <div class="card p-4">
-    <h2 v-if="esEdicion">Editar Producto</h2>
-    <h2 v-else>Crear Producto</h2>
-    
+  <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5">
+    <div class="mb-4 pb-2 border-bottom">
+      <h2 class="fw-bold text-dark mb-1">
+        {{ esEdicion ? '✏️ Editar Producto' : '➕ Crear Nuevo Producto' }}
+      </h2>
+      <small class="text-muted">
+        {{ esEdicion ? 'Actualiza los datos del producto seleccionado' : 'Ingresa la información para dar de alta el producto' }}
+      </small>
+    </div>
+
     <form @submit.prevent="guardar">
       <div class="mb-3">
-        <label>Nombre del Producto</label>
-        <input v-model="formulario.nombre" type="text" class="form-control" required>
+        <label class="form-label fw-semibold text-secondary">Nombre del Producto</label>
+        <input
+          v-model="formulario.nombre"
+          type="text"
+          class="form-control form-control-lg fs-6"
+          placeholder="Ej. Monitor Gamer 27 pulgadas"
+          required
+        >
       </div>
-      <div class="mb-3">
-        <label>Precio</label>
-        <input v-model.number="formulario.precio" type="number" class="form-control" required>
+      <div class="mb-4">
+        <label class="form-label fw-semibold text-secondary">Precio ($ MXN)</label>
+        <input
+          v-model.number="formulario.precio"
+          type="number"
+          min="1"
+          step="any"
+          class="form-control form-control-lg fs-6"
+          placeholder="Ej. 4500"
+          required
+        >
       </div>
-      <button type="submit" class="btn btn-primary">Guardar</button>
-      <button type="button" class="btn btn-secondary ms-2" @click="router.push('/productos')">Cancelar</button>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm fw-semibold">
+          {{ esEdicion ? 'Guardar Cambios' : 'Registrar Producto' }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4 py-2" @click="router.push('/productos')">
+          Cancelar
+        </button>
+      </div>
     </form>
   </div>
 </template>
