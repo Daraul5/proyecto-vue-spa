@@ -24,135 +24,178 @@ const formatearMoneda = (valor) => {
     minimumFractionDigits: 2
   }).format(valor || 0)
 }
+
+const procesarPago = () => {
+  alert('¡Gracias por tu compra! Tu pedido ha sido procesado')
+  cartStore.vaciarCarrito()
+  router.push('/productos')
+}
+
 </script>
 
 <template>
-  <div class="card shadow-sm border-0 rounded-4 p-4">
-    <!-- Encabezado con navegación rápida -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-2">
+  <div class="cart-container max-w-7xl mx-auto my-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
       <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" @click="router.push('/productos')">
-          ←
+        <button 
+          class="btn btn-light rounded-circle shadow-sm border-0 d-flex align-items-center justify-content-center transition-btn" 
+          style="width: 42px; height: 42px;" 
+          @click="router.push('/productos')"
+          title="Volver a productos"
+        >
+          <span class="fs-5 text-secondary">←</span>
         </button>
         <div>
-          <h2 class="fw-bold mb-0 text-dark">Carrito de Compras</h2>
-          <small class="text-muted">Revisa tus artículos antes de finalizar el pedido</small>
+          <h2 class="fw-bold mb-0 text-dark tracking-tight">Tu Carrito</h2>
+          <p class="text-muted small mb-0">Gestiona los artículos de tu pedido</p>
         </div>
       </div>
-      <button class="btn btn-outline-primary btn-sm" @click="router.push('/productos')">
+      <button 
+        class="btn btn-outline-dark rounded-pill px-4 btn-sm fw-medium"
+        @click="router.push('/productos')"
+      >
         + Seguir comprando
       </button>
     </div>
 
-    <!-- Si el carrito está vacío -->
-    <div v-if="cartStore.carrito.length === 0" class="text-center py-5">
-      <div class="fs-1 mb-3">🛒</div>
-      <h4 class="fw-bold text-secondary mb-2">Tu carrito está vacío</h4>
-      <p class="text-muted mb-4">No tienes ningún artículo agregado por el momento.</p>
-      <button class="btn btn-warning px-4 py-2 fw-bold shadow-sm" @click="router.push('/productos')">
-        Ver Catálogo de Productos
+    <!-- Vista de Carrito Vacío -->
+    <div v-if="cartStore.carrito.length === 0" class="text-center py-5 my-5 bg-white rounded-5 shadow-sm p-5 border border-light">
+      <div class="empty-icon-wrapper mx-auto mb-4 bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 90px; height: 90px;">
+        <span class="fs-1">🛍️</span>
+      </div>
+      <h3 class="fw-bold text-dark mb-2">Tu carrito está vacío</h3>
+      <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
+        Parece que aún no has añadido productos. Explora nuestro catálogo y encuentra lo que necesitas.
+      </p>
+      <button 
+        class="btn btn-dark px-4 py-2.5 rounded-pill fw-semibold shadow-sm tracking-wide" 
+        @click="router.push('/productos')"
+      >
+        Explorar Catálogo
       </button>
     </div>
 
-    <!-- Lista completa de artículos y total -->
-    <div v-else class="row g-4">
-      <!-- Columna izquierda: Lista detallada de productos agrupados -->
+    <!-- Vista de Carrito con Productos -->
+    <div v-else class="row g-4 align-items-start">
+      <!-- Lista de artículos -->
       <div class="col-lg-8">
-        <div class="list-group shadow-sm border-0 rounded-3">
-          <div
-            v-for="item in cartStore.itemsAgrupados"
-            :key="item.id"
-            class="list-group-item p-3 d-flex align-items-center justify-content-between gap-3 border-light-subtle"
-          >
-            <div class="d-flex align-items-center gap-3 min-w-0">
-              <div class="rounded bg-light d-flex align-items-center justify-content-center p-2 fs-3" style="width: 54px; height: 54px;">
-                {{ getIcono(item.nombre) }}
-              </div>
-              <div class="min-w-0">
-                <h6 class="mb-1 fw-bold text-dark text-truncate">{{ item.nombre }}</h6>
-                <div class="text-muted small">
-                  Precio unitario: {{ formatearMoneda(item.precio) }}
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+          <div class="list-group list-group-flush">
+            <div
+              v-for="item in cartStore.itemsAgrupados"
+              :key="item.id"
+              class="list-group-item p-4 d-flex align-items-center justify-content-between gap-3 border-bottom border-light"
+            >
+              <!-- Info del producto -->
+              <div class="d-flex align-items-center gap-3 min-w-0">
+                <div class="product-avatar rounded-4 bg-body-tertiary d-flex align-items-center justify-content-center fs-3 flex-shrink-0" style="width: 64px; height: 64px;">
+                  {{ getIcono(item.nombre) }}
                 </div>
-                <div class="text-success fw-bold small">
-                  Subtotal ({{ item.cantidad }} u.): {{ formatearMoneda(item.subtotal) }}
+                <div class="min-w-0">
+                  <h6 class="mb-1 fw-bold text-dark text-truncate fs-6">{{ item.nombre }}</h6>
+                  <div class="text-muted small mb-1">
+                    Precio: <span class="fw-medium text-dark">{{ formatearMoneda(item.precio) }}</span>
+                  </div>
+                  <div class="text-primary fw-semibold small">
+                    Subtotal: {{ formatearMoneda(item.subtotal) }}
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Controles de cantidad -->
-            <div class="d-flex align-items-center gap-3">
-              <div class="btn-group border rounded" role="group">
-                <button
-                  class="btn btn-light px-3 py-1 fw-bold text-secondary"
-                  title="Disminuir unidad"
-                  @click="cartStore.decrementarProducto(item.id)"
-                >
-                  -
-                </button>
-                <span class="px-3 py-1 d-flex align-items-center fw-bold bg-white">
-                  {{ item.cantidad }}
-                </span>
-                <button
-                  class="btn btn-light px-3 py-1 fw-bold text-secondary"
-                  title="Aumentar unidad"
-                  @click="cartStore.addAlCarrito(item)"
-                >
-                  +
-                </button>
               </div>
 
-              <button
-                class="btn btn-outline-danger btn-sm"
-                title="Eliminar este producto"
-                @click="cartStore.eliminarProductoCompleto(item.id)"
-              >
-                🗑️
-              </button>
+              <!-- Acciones y Controles de cantidad -->
+              <div class="d-flex align-items-center gap-3">
+                <div class="qty-pill d-flex align-items-center bg-light rounded-pill p-1 border">
+                  <button
+                    class="btn btn-sm btn-link text-dark text-decoration-none px-2 py-0 fw-bold border-0"
+                    title="Disminuir"
+                    @click="cartStore.decrementarProducto(item.id)"
+                  >
+                    -
+                  </button>
+                  <span class="px-2 fw-bold small text-dark min-w-qty text-center">
+                    {{ item.cantidad }}
+                  </span>
+                  <button
+                    class="btn btn-sm btn-link text-dark text-decoration-none px-2 py-0 fw-bold border-0"
+                    title="Aumentar"
+                    @click="cartStore.addAlCarrito(item)"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  class="btn btn-icon btn-light rounded-circle text-muted p-2 border-0 shadow-none hover-danger"
+                  title="Eliminar producto"
+                  @click="cartStore.eliminarProductoCompleto(item.id)"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="mt-3 d-flex justify-content-end">
-          <button class="btn btn-outline-danger btn-sm" @click="cartStore.vaciarCarrito">
-            Vaciar Carrito Completo
+        <div class="d-flex justify-content-end">
+          <button 
+            class="btn btn-link text-danger text-decoration-none btn-sm fw-medium px-0" 
+            @click="cartStore.vaciarCarrito"
+          >
+            Vaciar todo el carrito
           </button>
         </div>
       </div>
 
-      <!-- Columna derecha: Resumen del pedido -->
+      <!-- Resumen del Pedido -->
       <div class="col-lg-4">
-        <div class="card bg-light border-0 rounded-4 p-4 shadow-sm">
-          <h5 class="fw-bold text-dark mb-3">Resumen de Compra</h5>
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 20px;">
+          <h5 class="fw-bold text-dark mb-4">Resumen de la orden</h5>
 
-          <div class="d-flex justify-content-between mb-2 small text-muted">
-            <span>Productos ({{ cartStore.totalArticulos }}):</span>
-            <span>{{ formatearMoneda(cartStore.total) }}</span>
+          <div class="d-flex justify-content-between mb-3 text-secondary">
+            <span>Productos ({{ cartStore.totalArticulos }})</span>
+            <span class="fw-medium text-dark">{{ formatearMoneda(cartStore.total) }}</span>
           </div>
-          <div class="d-flex justify-content-between mb-3 small text-muted">
-            <span>Costo de envío:</span>
-            <span class="text-success fw-bold">Gratis</span>
+          
+          <div class="d-flex justify-content-between mb-3 text-secondary">
+            <span>Envío estimado</span>
+            <span class="text-success fw-semibold">Gratis</span>
           </div>
 
-          <hr />
+          <hr class="my-3 opacity-10" />
 
           <div class="d-flex justify-content-between align-items-baseline mb-4">
-            <span class="fw-bold fs-5 text-dark">Total:</span>
-            <span class="fs-4 fw-bold text-danger">{{ formatearMoneda(cartStore.total) }}</span>
+            <span class="fw-bold text-dark fs-5">Total</span>
+            <span class="fs-3 fw-bold text-dark tracking-tight">{{ formatearMoneda(cartStore.total) }}</span>
           </div>
 
           <button
-            class="btn btn-warning w-100 py-3 fw-bold shadow-sm mb-2"
-            style="background-color: #ffd814; border-color: #fcd200; color: #0f1111; font-size: 1.05rem;"
-            @click="alert('¡Gracias por tu compra! Tu pedido ha sido procesado de forma simulada.'); cartStore.vaciarCarrito(); router.push('/productos');"
+            class="btn btn-dark w-100 py-3 rounded-3 fw-bold shadow-sm mb-3 transition-btn border-0"
+            @click="procesarPago"
           >
             Proceder al Pago
           </button>
 
-          <small class="text-muted text-center d-block">
-            🔒 Compra protegida y segura
-          </small>
+          <div class="d-flex align-items-center justify-content-center gap-2 text-muted small">
+            <span>🔒</span>
+            <span>Pago seguro garantizado</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.min-w-qty {
+  min-width: 24px;
+}
+.transition-btn {
+  transition: all 0.2s ease-in-out;
+}
+.transition-btn:hover {
+  transform: translateY(-1px);
+}
+.hover-danger:hover {
+  background-color: #fee2e2 !important;
+}
+</style>
